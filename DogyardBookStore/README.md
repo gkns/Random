@@ -1,4 +1,4 @@
-<p>
+
 The Dogyard Book store assigns a unique code to books they stock which is ‘P’ followed by a number - for instance,
 ‘The Hitchhiker’s Guide to the Galaxy’ is listed as P42 in their price list catalog. Each book has an entry in the file as a
 comma-separated list - book-id, price, bookname. A sample price list (price.list):
@@ -80,4 +80,3 @@ Hint: C/C++  command line options may be parsed using ­ http://www.gn
 A GNU java port is also available ­ http://www.gnu.org/software/gnuprologjava/api/gnu/getopt/Getopt.html
 In  case  you  have trouble,  please  feel  free to reach  out  to  us over  email  and we’d  be  happy  to help  you  out  with  doubts and
 clarifications.
-</p>
