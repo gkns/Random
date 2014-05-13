@@ -78,5 +78,3 @@ $./yoda ­t transactions.txt ­p price.list ­d 150 ­c C3452
 
 Hint: C/C++  command line options may be parsed using ­ http://www.gnu.org/software/libc/manual/html_node/Getopt.html .
 A GNU java port is also available ­ http://www.gnu.org/software/gnuprologjava/api/gnu/getopt/Getopt.html
-In  case  you  have trouble,  please  feel  free to reach  out  to  us over  email  and we’d  be  happy  to help  you  out  with  doubts and
-clarifications.
