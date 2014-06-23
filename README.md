@@ -1,3 +1,3 @@
 About the repository:
 
-Some random programs written for the coding rounds of varios interviews
+Some random programs written to illustrate OOP
