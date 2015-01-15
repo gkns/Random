@@ -1,0 +1,23 @@
+ puzzle: I go to the market to buy some  items, I saw three item types which I liked namely A,B and C whose respective prices for one unit each are 4 , 6 and 9 rupees respectively. I have 100 rupees with me. There are a couple of rules which needs to be followed while buying these items 
+
+ a. I should but at least one each of A,B and C. 
+ b. I should spend the 100 rupees completely without any balance. 
+ 
+
+   I should get the maximum number of items (n(A) + n(B) + n(C)) should be the maximum following the above two rules
+
+  
+ There are two requirements from this puzzle. 
+  1. find the answer for the values given above. 
+  2. write a program  which would take in the following params and then return/identify the maximum number of items and also the combination which gets us that max number of items. 
+
+
+  int n  - number of distinct items (item types)   (3 <= n < 25 at all times)
+
+  int P[n] - an integer array holding the price of each of the n items in the order of a,b,c… i.e. P[0] holds the price for item “a”, P[1] holds the price for item “b” and so on. also note that Pa < Pb < Pc < Pd …. and so on).
+ 
+  int totalAmountInYourHand (represented as X below)     -     ( sumOf(P[…]) is always not more than 0.2 times X )
+
+
+  to make this more clear, say if you are asked to buy 6 item types viz- A,B,C,D,E and F and the respective prices are 5 , 8, 20 , 24, 30 and 40  . The total amount in your hand is Rs.1000/- (this is X) . Also note that the sum of the unit cost of all of these items would be not more than 20% of X. 
+
