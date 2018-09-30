@@ -13,95 +13,129 @@ public class GamePlay {
 	public static int WINNING_THRESHOLD=3;
 	public static int WINNING_SCORE=5;
 	public static int DEFUNCT_COIN_SCORE = -2;
+	
+	private static final String coinDataFile = "resources/Coins.csv";
+	private static final String playersDataFile = "resources/Players.csv";
+	private static final String movesDataFile = "resources/Moves.csv";
+	
+	private static GamePlay game;
+	private List<Player> players;
+	List<Coin> coins;
 
-	public static void main(String[] args) {
-		String coinDataFile = "resources/Coins.csv";
-		String playersDataFile = "resources/Players.csv";
-		String movesDataFile = "resources/Moves.csv";
-		GamePlay game = new GamePlay();
-		//Get coins
+	public List<Player> getPlayers() {
+		return players;
+	}
+
+	public List<MoveType> getMoves() {
+		return moves;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	private List<MoveType> moves;
+	private Board board;
+	
+	public void init() {
+		// Get coins
 		String coinsData = game.readCSV(coinDataFile);
-		List<Coin> coins = game.parseCoinsData(coinsData);
-		
-		//Get Players
-		String playersData = game.readCSV(playersDataFile);
-		List<Player> players = game.parsePlayerData(playersData);
-		
-		//Get Moves
-		String movesData = game.readCSV(movesDataFile);
-		List<MoveType> moves = game.parseMovesData(movesData);
-		
-		//Fill the board, add all the coins initially
-		Board board = new Board(coins);
-		
-		/*Iterate over moves
-		Assumption 1: There are only two players supported at the moment
-		Assumption 1: player one always starts
-		Assumption 2: a strike implies same player gets a repeat chance and 
-						next move is his move
-		Assumption 3: For multistrike points are not 
-						deducted from previous strike, just to keep it simple*/
-		Player currentPlayer = players.get(0);
-		Player otherPlayer = players.get(1);
-		int i=0; //to iterate over moves
-		int swapCount=0;
-		
-		System.out.println("Players: " + players.toString());
-		System.out.println("Moves: " + moves.toString());
-		System.out.println("Coins: " + coins.toString());
+		coins = game.parseCoinsData(coinsData);
 
-		while (i < moves.size() && board.getCoinsIn().size() > 0) {
-			MoveType move = moves.get(i);
-			switch(move) {
-				case MOVE_STRIKE: {
-					currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKE).getPoint());
-					if (!board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKE))) {
-						System.err.println("Error removing coin");
-					}
-					break;
+		// Get Players
+		String playersData = game.readCSV(playersDataFile);
+		players = game.parsePlayerData(playersData);
+
+		// Get Moves
+		String movesData = game.readCSV(movesDataFile);
+		moves = game.parseMovesData(movesData);
+
+		// Fill the board, add all the coins initially
+		board = new Board(coins);
+	}
+	
+	public boolean play(Player currentPlayer, Player otherPlayer) {
+		/*
+		 * Iterate over moves
+		 * Assumption 1: There are only two players supported at the moment. 
+		 * Assumption 2: Player one always starts.
+		 * Assumption 3: A strike implies same player gets a repeat chance and next move is his move.
+		 */
+		int i = 0; // to iterate over moves
+		int swapCount = 0;
+		boolean isSwapped = false;
+
+		System.out.println("Players: " + game.players.toString());
+		System.out.println("Moves: " + game.moves.toString());
+		System.out.println("Coins: " + game.board.getCoinsIn().toString());
+
+		while (i < game.moves.size() && game.board.getCoinsIn().size() > 0) {
+			MoveType move = game.moves.get(i);
+			switch (move) {
+			case MOVE_STRIKE: {
+				currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKE).getPoint());
+				if (!game.board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKE))) {
+					System.err.println("Error removing coin");
 				}
-				case MOVE_MULTISTRIKE: {
-					currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_MULTISTRIKE).getPoint());
-					board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_MULTISTRIKE));
-					break;
+				break;
+			}
+			case MOVE_MULTISTRIKE: {
+				currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_MULTISTRIKE).getPoint());
+				game.board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_MULTISTRIKE));
+				break;
+			}
+			case MOVE_RED_STRIKE: {
+				currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_RED_STRIKE).getPoint());
+				if (!game.board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_RED_STRIKE))) {
+					System.err.println("Error removing coin");
 				}
-				case MOVE_RED_STRIKE: {
-					currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_RED_STRIKE).getPoint());
-					if (!board.removeCoin(game.getCoinTypeForMoveType(MoveType.MOVE_RED_STRIKE))) {
-						System.err.println("Error removing coin");
-					}
-					break;
-				}
-				case MOVE_STRIKER_STRIKE: {
-					currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKER_STRIKE).getPoint());
-					//Pass to next player
-					Player temp = currentPlayer;
-					currentPlayer = otherPlayer;
-					otherPlayer = temp;
-					swapCount++;
-					break;
-				}
-				case MOVE_DEFUNCT_STRIKE: {
-					currentPlayer.addPoints(DEFUNCT_COIN_SCORE);
-					//Pass to next player
-					Player temp = currentPlayer;
-					currentPlayer = otherPlayer;
-					otherPlayer = temp;
-					swapCount++;
-					break;
-				}
-				case MOVE_NONE: {
-					//Pass to next player
-					Player temp = currentPlayer;
-					currentPlayer = otherPlayer;
-					otherPlayer = temp;
-					swapCount++;
-				}
+				break;
+			}
+			case MOVE_STRIKER_STRIKE: {
+				currentPlayer.addPoints(game.getCoinTypeForMoveType(MoveType.MOVE_STRIKER_STRIKE).getPoint());
+				// Pass to next player
+				Player temp = currentPlayer;
+				currentPlayer = otherPlayer;
+				otherPlayer = temp;
+				swapCount++;
+				break;
+			}
+			case MOVE_DEFUNCT_STRIKE: {
+				currentPlayer.addPoints(DEFUNCT_COIN_SCORE);
+				// Pass to next player
+				Player temp = currentPlayer;
+				currentPlayer = otherPlayer;
+				otherPlayer = temp;
+				swapCount++;
+				break;
+			}
+			case MOVE_NONE: {
+				// Pass to next player
+				Player temp = currentPlayer;
+				currentPlayer = otherPlayer;
+				otherPlayer = temp;
+				swapCount++;
+			}
 			}
 			i++;
 		}
+		if (swapCount%2 != 0) {
+			isSwapped = true;
+		}
+
+		return isSwapped;
+	}
+
+	public static void main(String[] args) {
+		game = new GamePlay(); 
+		game.init();
+		Player currentPlayer = game.players.get(0);
+		Player otherPlayer = game.players.get(1);
+		boolean winnerIsSwapped = game.play(currentPlayer, otherPlayer);
 		
-		if (swapCount % 2 != 0) {
+		System.out.println(winnerIsSwapped);
+
+		if (winnerIsSwapped) {
 			Player temp = currentPlayer;
 			currentPlayer = otherPlayer;
 			otherPlayer = temp;
@@ -113,9 +147,17 @@ public class GamePlay {
 		} else if (otherPlayer.hasWon(currentPlayer)) {
 			System.out.println(otherPlayer.getName() + " won the game. Final score: " + 
 					otherPlayer.getScore() + "-" + currentPlayer.getScore());
-		} else if (currentPlayer.isTied(otherPlayer, board)) {
+		} else if (currentPlayer.isTied(otherPlayer, game.board)) {
 			System.out.println("The game is tied. Final score: "
 						+ currentPlayer.getScore() + "-" + otherPlayer.getScore());
+		} else {
+			System.out.println("Not enough moves to determine the outcome!");
+			if (winnerIsSwapped) { //Just to display scores in Player1-Player2 format
+				Player temp = currentPlayer;
+				currentPlayer = otherPlayer;
+				otherPlayer = temp;
+			}
+			System.out.println("Final score: " + currentPlayer.getScore() + "-" + otherPlayer.getScore());
 		}
 	}
 

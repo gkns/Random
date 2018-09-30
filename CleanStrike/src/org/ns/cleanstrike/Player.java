@@ -32,25 +32,26 @@ public class Player {
 	public boolean hasWon(Player otherPlayer_) {
 		// winning player should have winningScore points and 
 		// it should be minimum winningThreshold points more than the opponent.
-		if ((GamePlay.WINNING_SCORE >= this.getScore()) && 
-				(GamePlay.WINNING_THRESHOLD >= this.getScore() - otherPlayer_.getScore())) {
+		if ((this.getScore() >= GamePlay.WINNING_SCORE) && 
+				((this.getScore() - otherPlayer_.getScore())) >= GamePlay.WINNING_THRESHOLD) {
 			hasWon = true;
 		}
 		return hasWon;
 	}
 	
 	public boolean isTied(Player otherPlayer_, Board board_) {
-		if (this.hasWon(otherPlayer_)) {
+		isTied = false;
+		if (this.hasWon(otherPlayer_) || otherPlayer_.hasWon(this)) {
 			isTied = false;
-			return isTied;
 		} else {
-			// draw means the other player hasn't won and the board has no coins left
-			if (board_.getCoinsIn().size() == 0 && !otherPlayer_.hasWon(this)) {
+			// draw means the board has no coins left
+			// and the highest scorer doesn't have minimum winning criteria
+			// minimum of 5 points and leading by atleast 3 point
+			if (board_.getCoinsIn().size() == 0) {
 				isTied  = true;
-				return isTied;
 			}
 		}
-		return false;
+		return isTied;
 	}
 	
 	@Override
